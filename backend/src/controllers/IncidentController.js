@@ -25,8 +25,18 @@ module.exports = {
     },
 
     async create(req, res) {
-        const { title, description, value } = req.body;
         const ong_id = req.headers.authorization;
+
+        const ong = await connection('ongs')
+            .where('id', ong_id)
+            .select('name')
+            .first();
+
+        if (!ong) {
+            return res.status(400).json({ error: 'No ONG found with this ID' });
+        }
+
+        const { title, description, value } = req.body;
 
         const [id] = await connection('incidents').insert({
             title,
